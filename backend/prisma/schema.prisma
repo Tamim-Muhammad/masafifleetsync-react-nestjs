@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  password          String
+  fullName          String
+  phone             String             @unique
+  accountStatus     String             @default("Pending")
+  role              String             // Enum: Customer, Driver, Admin, Dispatcher
+  createdAt         DateTime           @default(now())
+  waterOrders       WaterOrder[]       @relation("CustomerOrders")
+  driverOrders      WaterOrder[]       @relation("DriverOrders")
+  rentalAgreements  RentalAgreement[]
+  recoveryIncidents RecoveryIncident[]
+}
+
+model WaterOrder {
+  id          String   @id @default(cuid())
+  customerId  String
+  driverId    String?
+  vehicleId   String?
+  volume      Float
+  locationLat Float
+  locationLng Float
+  status      String   @default("Pending")
+  price       Float
+  createdAt   DateTime @default(now())
+
+  customer    User     @relation("CustomerOrders", fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  driver      User?    @relation("DriverOrders", fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vehicle     Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Vehicle {
+  id               String            @id @default(cuid())
+  plateNumber      String            @unique
+  chassisNumber    String            @unique
+  category         String            // Added category/type for inventory segregation (e.g., "Water Tanker Fleet", "Machinery & Hauling", "Emergency Recovery")
+  status           String            // Enum: Active, Maintenance, Rented, PendingInspection
+  insuranceExpiry  DateTime
+  licenseExpiry    DateTime
+  createdAt        DateTime          @default(now())
+  waterOrders      WaterOrder[]
+  rentalAgreements RentalAgreement[]
+}
+
+model RentalAgreement {
+  id             String   @id @default(cuid())
+  customerId     String
+  vehicleId      String
+  startDate      DateTime
+  endDate        DateTime
+  totalPrice     Float
+  depositStatus  String   @default("Pending")
+  contractPdfUrl String?
+  status         String   @default("Active")
+  createdAt      DateTime @default(now())
+
+  customer       User     @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model RecoveryIncident {
+  id          String   @id @default(cuid())
+  driverId    String?
+  callerName  String?
+  callerPhone String?
+  latitude    Float
+  longitude   Float
+  status      String   @default("Open")
+  description String
+  createdAt   DateTime @default(now())
+
+  driver      User?    @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  message   String   @db.Text
+  audience  String
+  priority  String
+  status    String   @default("Active Feed")
+  createdAt DateTime @default(now())
+}
