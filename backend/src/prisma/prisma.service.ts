@@ -5,14 +5,12 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
-    const connectionUrl = new URL(process.env.DATABASE_URL!);
-    
     const adapter = new PrismaMariaDb({
-      host: connectionUrl.hostname,
-      port: Number(connectionUrl.port) || 3306,
-      user: connectionUrl.username,
-      password: connectionUrl.password,
-      database: connectionUrl.pathname.replace(/^\//, ''),
+      host: process.env.MYSQLHOST!,
+      port: Number(process.env.MYSQLPORT!) || 3306,
+      user: process.env.MYSQLUSER!,
+      password: process.env.MYSQLPASSWORD!,
+      database: process.env.MYSQLDATABASE!,
       connectionLimit: 5,
     });
     
