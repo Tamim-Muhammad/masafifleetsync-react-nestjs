@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // Points directly to your NestJS backend
+  baseURL: process.env.REACT_APP_API_URL || import.meta.env?.VITE_API_URL || 'https://masafifleetsync-react-nestjs-production.up.railway.app',
 });
 
 export default api;
