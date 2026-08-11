@@ -5,15 +5,17 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
-    // Use environment variables from Railway instead of hardcoded strings
+    const connectionUrl = new URL(process.env.DATABASE_URL!);
+    
     const adapter = new PrismaMariaDb({
-      host: process.env.MYSQLHOST || 'localhost',
-      port: Number(process.env.MYSQLPORT) || 3306,
-      user: process.env.MYSQLUSER || 'root',
-      password: process.env.MYSQLPASSWORD || '',
-      database: process.env.MYSQLDATABASE || 'masafi_fleet',
+      host: connectionUrl.hostname,
+      port: Number(connectionUrl.port) || 3306,
+      user: connectionUrl.username,
+      password: connectionUrl.password,
+      database: connectionUrl.pathname.replace(/^\//, ''),
       connectionLimit: 5,
     });
+    
     super({ adapter });
   }
 
