@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -39,16 +40,16 @@ model WaterOrder {
 }
 
 model Vehicle {
-  id               String            @id @default(cuid())
-  plateNumber      String            @unique
-  chassisNumber    String            @unique
-  category         String            // Added category/type for inventory segregation (e.g., "Water Tanker Fleet", "Machinery & Hauling", "Emergency Recovery")
-  status           String            // Enum: Active, Maintenance, Rented, PendingInspection
-  insuranceExpiry  DateTime
-  licenseExpiry    DateTime
-  createdAt        DateTime          @default(now())
-  waterOrders      WaterOrder[]
-  rentalAgreements RentalAgreement[]
+  id                String            @id @default(cuid())
+  plateNumber       String            @unique
+  chassisNumber     String            @unique
+  category          String            // Added category/type for inventory segregation (e.g., "Water Tanker Fleet", "Machinery & Hauling", "Emergency Recovery")
+  status            String            // Enum: Active, Maintenance, Rented, PendingInspection
+  insuranceExpiry   DateTime
+  licenseExpiry     DateTime
+  createdAt         DateTime          @default(now())
+  waterOrders       WaterOrder[]
+  rentalAgreements  RentalAgreement[]
 }
 
 model RentalAgreement {
